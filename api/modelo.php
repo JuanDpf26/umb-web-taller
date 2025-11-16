@@ -1,25 +1,37 @@
 <?php
 require_once 'db.php';
 
-// CREATE (Crear)
+// CREATE
 function crearTarea($titulo) {
     global $conexion;
-    // Usar htmlspecialchars para prevenir XSS
     $titulo_seguro = htmlspecialchars($titulo);
     $sql = "INSERT INTO tareas (titulo) VALUES ('$titulo_seguro')";
-     mysqli_query($conexion, $sql);
+    mysqli_query($conexion, $sql);
 }
 
-// READ (Leer)
+// READ
 function obtenerTareas() {
     global $conexion;
     $sql = "SELECT * FROM tareas";
-     $resultado = mysqli_query($conexion, $sql);
+    $resultado = mysqli_query($conexion, $sql);
     $tareas = [];
     while ($fila = mysqli_fetch_assoc($resultado)) {
         $tareas[] = $fila;
     }
     return $tareas;
 }
-// ... (Aquí se implementarían Update y Delete)
-?>
+
+// UPDATE
+function actualizarTarea($id, $titulo) {
+    global $conexion;
+    $titulo_seguro = htmlspecialchars($titulo);
+    $sql = "UPDATE tareas SET titulo='$titulo_seguro' WHERE id=$id";
+    mysqli_query($conexion, $sql);
+}
+
+// DELETE
+function eliminarTarea($id) {
+    global $conexion;
+    $sql = "DELETE FROM tareas WHERE id=$id";
+    mysqli_query($conexion, $sql);
+}
