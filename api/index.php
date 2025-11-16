@@ -4,7 +4,7 @@ header("Access-Control-Allow-Headers: Content-Type");
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Content-Type: application/json");
 
-// Render envía una petición OPTIONS antes de PUT/DELETE
+// Render envía una petición OPTIONS ANTES de PUT o DELETE
 if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
     http_response_code(200);
     exit();
@@ -31,34 +31,20 @@ switch ($method) {
         break;
 
     case 'PUT':
-        if (!isset($data["id"])) {
-            echo json_encode(["error" => "Falta ID"]);
+        if (!isset($data["id"]) || !isset($data["titulo"])) {
+            echo json_encode(["error" => "Faltan datos para actualizar"]);
             exit();
         }
-
-        // Si viene 'completada', actualiza solo el estado
-        if (isset($data["completada"])) {
-            actualizarEstado($data["id"], $data["completada"]);
-            echo json_encode(["mensaje" => "Estado actualizado"]);
-            break;
-        }
-
-        // Si viene 'titulo', actualiza el título
-        if (!isset($data["titulo"])) {
-            echo json_encode(["error" => "Falta título"]);
-            exit();
-        }
-
         actualizarTarea($data["id"], $data["titulo"]);
         echo json_encode(["mensaje" => "Tarea actualizada"]);
         break;
 
     case 'DELETE':
-        if (!isset($_GET["id"])) {
-            echo json_encode(["error" => "Falta id"]);
+        if (!isset($data["id"])) {
+            echo json_encode(["error" => "Falta id para eliminar"]);
             exit();
         }
-        eliminarTarea($_GET["id"]);
+        eliminarTarea($data["id"]);
         echo json_encode(["mensaje" => "Tarea eliminada"]);
         break;
 
