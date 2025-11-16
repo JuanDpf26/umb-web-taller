@@ -4,19 +4,20 @@ require_once 'db.php';
 // CREATE
 function crearTarea($titulo) {
     global $conexion;
-    $titulo_seguro = htmlspecialchars($titulo);
-    $sql = "INSERT INTO tareas (titulo) VALUES ('$titulo_seguro')";
+    $titulo = mysqli_real_escape_string($conexion, $titulo);
+    $sql = "INSERT INTO tareas (titulo, completada) VALUES ('$titulo', 0)";
     mysqli_query($conexion, $sql);
 }
 
 // READ
 function obtenerTareas() {
     global $conexion;
-    $sql = "SELECT * FROM tareas";
-    $resultado = mysqli_query($conexion, $sql);
+    $sql = "SELECT * FROM tareas ORDER BY id DESC";
+    $result = mysqli_query($conexion, $sql);
+
     $tareas = [];
-    while ($fila = mysqli_fetch_assoc($resultado)) {
-        $tareas[] = $fila;
+    while ($row = mysqli_fetch_assoc($result)) {
+        $tareas[] = $row;
     }
     return $tareas;
 }
@@ -24,8 +25,8 @@ function obtenerTareas() {
 // UPDATE
 function actualizarTarea($id, $titulo) {
     global $conexion;
-    $titulo_seguro = htmlspecialchars($titulo);
-    $sql = "UPDATE tareas SET titulo='$titulo_seguro' WHERE id=$id";
+    $titulo = mysqli_real_escape_string($conexion, $titulo);
+    $sql = "UPDATE tareas SET titulo='$titulo' WHERE id=$id";
     mysqli_query($conexion, $sql);
 }
 
@@ -35,3 +36,4 @@ function eliminarTarea($id) {
     $sql = "DELETE FROM tareas WHERE id=$id";
     mysqli_query($conexion, $sql);
 }
+?>
