@@ -1,55 +1,48 @@
 <?php
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type");
-header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: *");
+header("Access-Control-Allow-Methods: *");
 header("Content-Type: application/json");
-
-// Render envía una petición OPTIONS ANTES de PUT o DELETE
-if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
-    http_response_code(200);
-    exit();
-}
 
 require_once 'modelo.php';
 
-$method = $_SERVER['REQUEST_METHOD'];
-$data = json_decode(file_get_contents("php://input"), true);
+$metodo = $_SERVER['REQUEST_METHOD'];
 
-switch ($method) {
+switch ($metodo) {
 
     case 'GET':
         echo json_encode(obtenerTareas());
         break;
 
     case 'POST':
-        if (!isset($data["titulo"]) || trim($data["titulo"]) === "") {
-            echo json_encode(["error" => "Falta el título"]);
-            exit();
-        }
-        crearTarea($data["titulo"]);
-        echo json_encode(["mensaje" => "Tarea creada correctamente"]);
+        $data = json_decode(file_get_contents("php://input"), true);
+        crearTarea($data['titulo']);
+        echo json_encode(["ok" => true, "mensaje" => "Tarea creada exitosamente"]);
         break;
 
     case 'PUT':
-        if (!isset($data["id"]) || !isset($data["titulo"])) {
-            echo json_encode(["error" => "Faltan datos para actualizar"]);
-            exit();
+        $data = json_decode(file_get_contents("php://input"), true);
+
+        // Si llega "titulo", es edición
+        if (isset($data['titulo'])) {
+            editarTarea($data['id'], $data['titulo']);
+            echo json_encode(["ok" => true, "mensaje" => "Tarea actualizada"]);
         }
-        actualizarTarea($data["id"], $data["titulo"]);
-        echo json_encode(["mensaje" => "Tarea actualizada"]);
+        // Si llega "completada", es toggle
+        else if (isset($data['completada'])) {
+            marcarCompletada($data['id'], $data['completada']);
+            echo json_encode(["ok" => true, "mensaje" => "Estado actualizado"]);
+        }
         break;
 
     case 'DELETE':
-        if (!isset($data["id"])) {
-            echo json_encode(["error" => "Falta id para eliminar"]);
-            exit();
-        }
-        eliminarTarea($data["id"]);
-        echo json_encode(["mensaje" => "Tarea eliminada"]);
+        $id = $_GET['id'];
+        eliminarTarea($id);
+        echo json_encode(["ok" => true, "mensaje" => "Tarea eliminada"]);
         break;
 
     default:
-        echo json_encode(["error" => "Método no permitido"]);
+        echo json_encode(["ok" => false, "mensaje" => "Método no permitido"]);
         break;
 }
 ?>

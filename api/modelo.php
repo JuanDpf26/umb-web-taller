@@ -4,37 +4,46 @@ require_once 'db.php';
 // CREATE
 function crearTarea($titulo) {
     global $conexion;
-    $titulo = mysqli_real_escape_string($conexion, $titulo);
-    $sql = "INSERT INTO tareas (titulo, completada) VALUES ('$titulo', 0)";
-    mysqli_query($conexion, $sql);
+    $titulo_seguro = htmlspecialchars($titulo);
+
+    $sql = "INSERT INTO tareas (titulo, completada) VALUES ('$titulo_seguro', 0)";
+    return mysqli_query($conexion, $sql);
 }
 
 // READ
 function obtenerTareas() {
     global $conexion;
     $sql = "SELECT * FROM tareas ORDER BY id DESC";
-    $result = mysqli_query($conexion, $sql);
+    $resultado = mysqli_query($conexion, $sql);
 
     $tareas = [];
-    while ($row = mysqli_fetch_assoc($result)) {
-        $tareas[] = $row;
+    while ($fila = mysqli_fetch_assoc($resultado)) {
+        $tareas[] = $fila;
     }
     return $tareas;
 }
 
-// UPDATE
-function actualizarTarea($id, $titulo) {
+// UPDATE titulo
+function editarTarea($id, $titulo) {
     global $conexion;
-    $titulo = mysqli_real_escape_string($conexion, $titulo);
-    $sql = "UPDATE tareas SET titulo='$titulo' WHERE id=$id";
-    mysqli_query($conexion, $sql);
+    $titulo_seguro = htmlspecialchars($titulo);
+
+    $sql = "UPDATE tareas SET titulo='$titulo_seguro' WHERE id=$id";
+    return mysqli_query($conexion, $sql);
+}
+
+// UPDATE completada
+function marcarCompletada($id, $completada) {
+    global $conexion;
+    $sql = "UPDATE tareas SET completada=$completada WHERE id=$id";
+    return mysqli_query($conexion, $sql);
 }
 
 // DELETE
 function eliminarTarea($id) {
     global $conexion;
     $sql = "DELETE FROM tareas WHERE id=$id";
-    mysqli_query($conexion, $sql);
+    return mysqli_query($conexion, $sql);
 }
 ?>
 
